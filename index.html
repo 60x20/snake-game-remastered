@@ -3,31 +3,131 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#595f43"/>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"/>
     <title>Snake Game</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css"/>
     <script src="script.js" defer></script>
   </head>
   <body>
-    <div>
-      <div class="scores">
-        <h1 id="score">000</h1>
-        <h1 id="highScore">000</h1>
-      </div>
-      <div class="game-border-1">
-        <div class="game-border-2">
-          <div class="game-border-3">
-            <div id="game-board"></div>
+    <div id="wrapper-box">
+      <div id="variable-setters">
+        <label>
+          <span>Set Delay</span>
+          <div class="input-wrapper">
+            <input id="set-speed" type="number" value="100" min="0" max="10000">
+            <div class="crement-btn-wrapper">
+              <button class="increment-btn" type="button">
+                <img src="left-arrow-svgrepo-com.svg" alt="increment-arrow">
+              </button>
+              <button class="decrement-btn" type="button">
+                <img src="left-arrow-svgrepo-com.svg" alt="decrement-arrow">
+              </button>
+            </div>
           </div>
+        </label>
+        <label>
+          <span>Set Column Size</span>
+          <div class="input-wrapper">
+            <input id="set-grid-column-size" value="15" type="number" min="1" max="1000">
+            <div class="crement-btn-wrapper">
+              <button class="increment-btn" type="button">
+                <img src="left-arrow-svgrepo-com.svg" alt="increment-arrow">
+              </button>
+              <button class="decrement-btn" type="button">
+                <img src="left-arrow-svgrepo-com.svg" alt="decrement-arrow">
+              </button>
+            </div>
+          </div>
+        </label>
+        <label>
+          <span>Set Row Size</span>
+          <div class="input-wrapper">
+            <input id="set-grid-row-size" value="15" type="number" min="1" max="1000">
+            <div class="crement-btn-wrapper">
+              <button class="increment-btn" type="button">
+                <img src="left-arrow-svgrepo-com.svg" alt="increment-arrow">
+              </button>
+              <button class="decrement-btn" type="button">
+                <img src="left-arrow-svgrepo-com.svg" alt="decrement-arrow">
+              </button>
+            </div>
+          </div>
+        </label>
+        <label>
+          <span>Set Column Px</span>
+          <div class="input-wrapper">
+            <input id="set-grid-column-px" value="30" type="number" min="1" max="1000">
+            <div class="crement-btn-wrapper">
+              <button class="increment-btn" type="button">
+                <img src="left-arrow-svgrepo-com.svg" alt="increment-arrow">
+              </button>
+              <button class="decrement-btn" type="button">
+                <img src="left-arrow-svgrepo-com.svg" alt="decrement-arrow">
+              </button>
+            </div>
+          </div>
+        </label>
+        <label>
+          <span>Set Row Px</span>
+          <div class="input-wrapper">
+            <input id="set-grid-row-px" value="30" type="number" min="1" max="1000">
+            <div class="crement-btn-wrapper">
+              <button class="increment-btn" type="button">
+                <img src="left-arrow-svgrepo-com.svg" alt="increment-arrow">
+              </button>
+              <button class="decrement-btn" type="button">
+                <img src="left-arrow-svgrepo-com.svg" alt="decrement-arrow">
+              </button>
+            </div>
+          </div>
+        </label>
+        <button id="collision-btn" type="button">Collision</button>
+      </div>
+      <div id="wrapper-div">
+        <div class="scores">
+          <h1 id="score">000</h1>
+          <h1 id="highScore">000</h1>
+        </div>
+        <div id="instruments">
+          <h1 id="speed-instrument">xms</h1>
+          <h1 id="area-instrument">AxB</h1>
+          <h1 id="grid-px-instrument">ApxxBpx</h1>
+          <h1 id="game-paused-instrument">paused</h1>
+          <h1 id="collision-instrument"></h1>
+        </div>
+        <div id="game-state">
+          <button id="start-btn" type="button">Start</button>
+          <button id="stop-btn" type="button">Stop</button>
+          <button id="toggle-btn" type="button">Toggle</button>
+          <button id="reset-btn" type="button">Reset</button>
+        </div>
+        <div id="game-board"></div>
+        <div id="start-wrapper">
+          <img id="logo" src="snake-game-ai-gen.png" alt="snake-logo" />
+          <h1 id="instruction-text">Press spacebar to start the game</h1>
         </div>
       </div>
+      <div id="accessibility-div">
+        <!-- tab loop -->
+        <span tabindex="1"></span>
+        <button type="button" tabindex="2" id="move-up-btn">
+          <img src="left-arrow-svgrepo-com.svg" alt="up-arrow">
+        </button>
+        <button type="button" tabindex="3" id="move-left-btn">
+          <img src="left-arrow-svgrepo-com.svg" alt="left-arrow">
+        </button>
+        <button type="button" tabindex="4" id="move-right-btn">
+          <img src="left-arrow-svgrepo-com.svg" alt="right-arrow">
+        </button>
+        <button type="button" tabindex="5" id="move-down-btn">
+          <img src="left-arrow-svgrepo-com.svg" alt="down-arrow">
+        </button>
+        <span tabindex="6"></span>
+      </div>
     </div>
-    <h1 id="instruction-text">Press spacebar to start the game</h1>
-    <img id="logo" src="snake-game-ai-gen.png" alt="snake-logo" />
   </body>
 </html>

@@ -1,89 +1,477 @@
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  margin: 0;
-  font-family: 'VT323', monospace;
+:root {
+  /* these variables are referenced and will be overridden via JS */
+  
+  /* max function and vw, vh, px should not be altered, numbers can be (accessed via JS (regex used)) */
+  /* vh, vw will be converted to px via JS to allow zooming */
+  /* grid-column-px set via media queries, depending on the aspect ratio */
+  --grid-column-px: max(3.5vh, 3.5vw, 8px);
+  --grid-row-px: var(--grid-column-px);
+
+  /* automatically set via JS */
+  --grid-column-size: 15;
+  --grid-row-size: 15;
+
+  /* variables special to snake, since snake element is constantly changing stored in the root */
+  /* variables for border values (will be overridden via JS) */ 
+  --head-top: 0;
+  --head-bottom: var(--bottomAsHead);
+  --head-left: var(--leftAsSide);
+  --head-right: var(--rightAsSide);
+  /* sides */
+  --topAsSide: calc(var(--grid-row-px) / 4) solid transparent;
+  --bottomAsSide: calc(var(--grid-row-px) / 4) solid transparent;
+  --leftAsSide: calc(var(--grid-column-px) / 4) solid transparent;
+  --rightAsSide: calc(var(--grid-column-px) / 4) solid transparent;
+  /* heads */
+  --topAsHead: var(--grid-row-px) solid darkgray;
+  --bottomAsHead: var(--grid-row-px) solid darkgray;
+  --leftAsHead: var(--grid-column-px) solid darkgray;
+  --rightAsHead: var(--grid-column-px) solid darkgray;
+
+  /* variables used on game-board */
+  /* border should be whichever is min, making board cover max 65% (50% + 15%) */
+  --total-border: calc(var(--min-distance-of-board) * .1);
+  --total-box-shadow: calc(var(--total-border) * .5);
+  --board-width: calc(var(--grid-column-size) * var(--grid-column-px));
+  --board-height: calc(var(--grid-row-size) * var(--grid-row-px));
+  --min-distance-of-board: min(var(--board-height), var(--board-width));
+  --wrapper-div-width: calc(var(--board-width) + (2 * var(--total-box-shadow)) + (2 * var(--total-border)));
+  --wrapper-div-height: calc(var(--board-height) + (2 * var(--total-box-shadow)) + (2 * var(--total-border)));
+  --board-color: #c4cfa3;
+  --green-text-color: #abb78a;
 }
 
-body,
-.snake {
+/* setting grid-column-px depending on the aspect-ratio */
+/* width > height */
+@media (min-aspect-ratio: 1.4) {
+  :root {
+    --grid-column-px: max(1vh, 3.2vw, 8px);
+    --grid-row-px: var(--grid-column-px);
+  }
+}
+/* width >> height */
+@media (min-aspect-ratio: 1.6) {
+  :root {
+    --grid-column-px: max(1vh, 2.75vw, 8px);
+    --grid-row-px: var(--grid-column-px);
+  }
+}
+/* height > width */
+@media (max-aspect-ratio: .7) {
+  :root {
+    --grid-column-px: max(4vh, 1vw, 8px);
+    --grid-row-px: var(--grid-column-px);
+  }
+}
+/* height >> width */
+@media (max-aspect-ratio: .6) {
+  :root {
+    --grid-column-px: max(3.8vh, 1vw, 8px);
+    --grid-row-px: var(--grid-column-px);
+  }
+}
+/* height >>> width */
+@media (max-aspect-ratio: .5) {
+  :root {
+    --grid-column-px: max(3.5vh, 1vw, 8px);
+    --grid-row-px: var(--grid-column-px);
+  }
+}
+/* height >>>> width */
+@media (max-aspect-ratio: .4) {
+  :root {
+    --grid-column-px: max(3vh, 1vw, 8px);
+    --grid-row-px: var(--grid-column-px);
+  }
+}
+/* height >>>>> width */
+@media (max-aspect-ratio: .35) {
+  :root {
+    --grid-column-px: max(2.5vh, 1vw, 8px);
+    --grid-row-px: var(--grid-column-px);
+  }
+}
+/* similar */
+@media (min-aspect-ratio: .7) and (max-aspect-ratio: 1.4) {
+  :root {
+    --grid-column-px: max(3.5vh, 3.5vw, 8px);
+    --grid-row-px: var(--grid-column-px);
+  }
+}
+
+html, body {
+  /* since the child is absolutely positioned in case height left auto, height will be 0px, 100% makes it cover the viewport */
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'VT323', monospace;
   background-color: #414141;
 }
 
+#wrapper-box {
+  /* placed at the center, and always will be at the center */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  /* must have fixed width and height, otherwise content will make the box bigger and since box is positioned at the center we will not be able to scroll to left and top */
+  /* content will overflow towards right and bottom */
+  width: 100%;
+  /* height 95% leaves 2.5% space at the top and bottom, and this places the contents (almost) at the center */
+  height: 95%;
+}
+/* when width and height are similar adding some space to top might cause overflowing towards bottom */
+@media (max-aspect-ratio: 1.6) {
+  #wrapper-box {
+    height: 100%;
+  }  
+}
+@media (max-aspect-ratio: .6) {
+  #wrapper-box {
+    height: 95%;
+  }  
+}
+
+#wrapper-box > * {
+  /* since they are placed at flex-start, they won't be at the center but should be at the center */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* h1 elements are used like p */
+h1 {
+  margin: 0;
+  font-size: inherit;
+}
+
+button {
+  border: none;
+  font-size: calc(var(--min-distance-of-board) * .07);
+  padding: calc(var(--min-distance-of-board) * .01);
+  background-color: darkgray;
+  color: black;
+  cursor: pointer;
+}
+
+#wrapper-div {
+  position: relative;
+  padding: var(--total-box-shadow); /* padding is due to box shadow being outside of the document flow  */
+  z-index: 0; /* creating a parent stacking context for children */
+  font-size: calc(var(--min-distance-of-board) * .1);
+}
+
 #game-board {
-  border-radius: 100px;
   display: grid;
-  grid-template-columns: repeat(20, 20px);
-  grid-template-rows: repeat(20, 20px);
-  margin: 5px;
+  grid-template-columns: repeat(var(--grid-column-size), var(--grid-column-px));
+  grid-template-rows: repeat(var(--grid-row-size), var(--grid-row-px));
+  background-color: var(--board-color);
+  border: #8b966c solid var(--total-border);
+  border-radius: var(--total-border);
+  box-shadow: 
+    0 0 0 calc(var(--total-box-shadow) * .5) var(--green-text-color),
+    0 0 0 var(--total-box-shadow) #595f43
+  ;
+  position: relative;
+  z-index: -1; /* game-board (along with its children) should always be under the start-wrapper */
 }
 
-.game-border-1 {
-  border: #595f43 solid 10px;
-  border-radius: 30px;
-  box-shadow: inset 0 0 0 10px #595f43;
+/* div.snake and div.food elements are generated in JS */
+.snake {
+  box-sizing: border-box;
+  background-color: #595f43;
+}
+/* setting color for the head of the snake */
+:first-of-type.snake {
+  /* !important is because (when snake.length is 1) :first-of-type.snake === :nth-last-of-type(2).snake */
+  background-color: transparent !important;
+  z-index: 3 !important; /* head should always be seen when it is overlapping another piece */
+  
+  /* shaping the head depending on the direction, will be applied via JS */
+  border-top: var(--head-top);
+  border-bottom: var(--head-bottom);
+  border-left: var(--head-left);
+  border-right: var(--head-right);
+}
+/* setting color for the first three pieces of snake after the head */
+.snake:is(:nth-of-type(2), :nth-of-type(3), :nth-of-type(4)) {
+  background-color: darkgray;
+  z-index: 1; /* should be seen when overlapping another piece, except for the head and food */
+}
+/* setting color for the tail (the last part of the snake) (it's always just before the div.food) */
+:nth-last-of-type(2).snake {
+  background-color: black;
+  z-index: 1; /* should be seen when overlapping another piece, except for the head and food */
+}
+.food {
+  background-color: #dedede;
+  z-index: 2; /* should be seen when overlapping another piece, except for the head */
+  border-radius: 50%;
 }
 
-.game-border-2 {
-  border: #abb78a solid 8px;
-  border-radius: 26px;
-  box-shadow: inset 0 0 0 10px #abb78a;
+#start-wrapper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  display: flex;
+  flex-direction: column;
+  /* height and width === gameboard height and width */
+  height: var(--board-height);
+  width: var(--board-width);
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--min-distance-of-board) * .1);
+  background-color: var(--board-color); /* background-color is to remove transparency ('display: none' is added via JS) */
 }
 
-.game-border-3 {
-  border: #8b966c solid 30px;
-  border-radius: 20px;
-  box-shadow: inset 0 0 0 5px #8b966c;
+/* making the logo unselectable, undraggable */
+img, * {
+  user-select: none;
+}
+img {
+  pointer-events: none;
+}
+
+#logo {
+  height: calc(var(--min-distance-of-board) * .5);
+  width: 100%;
+  object-fit: contain;
 }
 
 #instruction-text {
-  position: absolute;
-  top: 60%;
   color: #333;
-  width: 300px;
   text-align: center;
   text-transform: capitalize;
-  padding: 30px;
-  margin: 0;
+  font-size: inherit;
 }
 
-.scores {
+/* instruments and game-state are on the vertical sides */
+#instruments, #game-state {
+  position: absolute;
+  top: var(--total-box-shadow);
+  height: calc(100% - (var(--total-box-shadow) * 2));
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8%;
+}
+
+#instruments {
+  right: 100%;
+  align-items: flex-end;
+  text-align: end;
+  color: var(--green-text-color);
+}
+
+#speed-instrument::after {
+  content: 'ms';
+}
+
+#game-state {
+  left: 100%;
+  align-items: stretch;
+}
+
+#variable-setters {
+  width: var(--wrapper-div-width);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+  column-gap: 1%;
+}
+#variable-setters > * {
+  flex-shrink: 2; /* so that grid-column-size and grid-column-px don't shrink too much */
+}
+#variable-setters > label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: calc(var(--min-distance-of-board) * .07);
+}
+label:has([id*="grid-column"]) {
+  /* since 'column' is a long word, those that have this word should shrink more */
+  flex-shrink: 3 !important; /* low specificity */
+}
+#variable-setters > label span {
+  color: var(--green-text-color);
+}
+#variable-setters .input-wrapper {
+  /* with this wrapper we are able to get input element's height */
+  position: relative;
+  width: 100%;
+}
+#variable-setters input {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  font-size: calc(var(--min-distance-of-board) * .07);
+  text-align: center;
+  appearance: textfield; /* spin buttons are overridden */
+}
+/* spin buttons are overridden */
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+#variable-setters > label .crement-btn-wrapper {
+  width: calc(var(--min-distance-of-board) * .07);
+  max-width: 35%;
+  height: 100%;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: darkgray;
+}
+#variable-setters > label button {
+  padding: 0;
+  flex-grow: 1; /* buttons do not have any height, or content that can contribute to the height, flex-grow: 1 makes them cover the box equally */
+  background-color: transparent;
+  position: relative; /* parent containing block for absolutely positioned images*/
+  overflow: hidden; /* images are rotated, this makes some parts overflow */
+}
+#variable-setters > label button img {
+  position: absolute; /* img should not change the dimensions of its parent containing block */
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: transparent;
+}
+#variable-setters > label button.increment-btn img {
+  rotate: 90deg;
+}
+#variable-setters > label button.decrement-btn img {
+  rotate: 270deg;
+}
+/* if height > width then there will be less space for the buttons if text-align is center */
+/* buttons seem so small when width is too small, they should be bigger if height > width */
+@media (max-aspect-ratio: 1.1) {
+  #variable-setters input {
+    text-align: left;
+  }
+  #variable-setters > label .crement-btn-wrapper {
+    width: 45%;
+    max-width: 45%;
+  }
+}
+
+button:focus-visible, input:focus-visible {
+  /* User Agent's custom style will be overridden */
+  outline: black solid calc(var(--min-distance-of-board) * .01);
+}
+
+/* .scores is on one of the horizontal sides */
+.scores {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
   justify-content: space-between;
 }
 
 #score {
-  color: #abb78a;
-}
-
-#score,
-#highScore {
-  font-size: 40px;
-  font-weight: bolder;
-  margin: 10px 0;
+  color: var(--green-text-color);
 }
 
 #highScore {
   color: #d8ddca;
-  display: none;
 }
 
-.game-border-3,
-#logo {
-  background-color: #c4cfa3;
+#accessibility-div {
+  width: var(--wrapper-div-width);
+  display: grid;
+  grid-template-areas: 
+    ". up up ."
+    "left left right right"
+    ". down down ."
+  ;
+  height: calc(var(--wrapper-div-height) * .30);
+  flex-shrink: 0; /* grid-items have their width & height set to auto, so they shrink, but they shouldn't */
+  row-gap: 5%;
+  /* if accessibility-div overflows towards bottom, a space of 1% between bottom and accessibility-div will make the buttons more accessible */
+  padding-bottom: 1%;
 }
 
-.snake {
-  border: #5a5a5a 1px dotted;
+/* if height > width, then min-distance-of-board will be based on width, which will make the board-height cover less of the viewport height */
+/* if height > width,  */
+@media (max-aspect-ratio: 0.8) {
+  #accessibility-div {
+    height: calc(var(--wrapper-div-height) * .40);
+  }
+}
+/* if height >> width */
+@media (max-aspect-ratio: 0.6) {
+  #accessibility-div {
+    height: calc(var(--wrapper-div-height) * .45);
+  }
 }
 
-.food {
-  background-color: #dedede;
-  border: #999 5px solid;
+#accessibility-div button {
+  padding: 0;
+  position: relative; /* parent containing block for absolutely positioned images*/
+  background-color: gray;
+  overflow: hidden; /* images are rotated, this makes some parts overflow */
 }
 
-#logo {
+#accessibility-div button img {
+  position: absolute; /* img should not change the dimensions of its parent containing block */
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: transparent;
+}
+
+#move-up-btn {
+  grid-area: up;
+}
+#move-left-btn {
+  grid-area: left;
+}
+#move-right-btn {
+  grid-area: right;
+}
+#move-down-btn {
+  grid-area: down;
+}
+
+#move-up-btn img {
+  rotate: 90deg;
+}
+#move-left-btn img {
+  rotate: 0deg;
+}
+#move-right-btn img {
+  rotate: 180deg;
+}
+#move-down-btn img {
+  rotate: 270deg;
+}
+
+/* tab loop */
+#accessibility-div > :first-child {
   position: absolute;
+}
+#accessibility-div > :last-child {
+  position: absolute;
+}
+
+.displayNone {
+  display: none !important;
 }
