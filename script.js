@@ -512,102 +512,85 @@ lastChildForTabLoop.addEventListener('focus', () => {
 })
 
 function incrementInputButton (e) {
-  // parent is the sibling of the input, grandParent is the parent of the input
-  for (const child of e.currentTarget.parentElement.parentElement.children) {
-    if (child.matches('input')) {
-      // should not be greater than max
-      const maxVal = Number(child.getAttribute('max'));
+  // select the input element inside the .input-wrapper
+  const input = e.currentTarget.closest('.input-wrapper').querySelector('input');
 
-      if ((Number(child.value) + 1) >= maxVal) {
-        child.value = maxVal;
-      } else {
-        child.value++;
-      }
+  // should not be greater than max
+  const maxVal = Number(input.getAttribute('max'));
 
-      // should trigger an change event, handlers called with an object that has an 'currentTarget: input' property, so that value of the input can be obtained using e.currentTarget.value
-      whichHandlerToCall(child);
-
-      return undefined; // short circuit 
-    }
+  if ((Number(input.value) + 1) >= maxVal) {
+    input.value = maxVal;
+  } else {
+    input.value++;
   }
+
+  // should trigger a change event, handlers called with an object that has an 'currentTarget: input' property, so that value of the input can be obtained using e.currentTarget.value
+  whichHandlerToCall(input);
 }
 function decrementInputButton (e) {
-  // parent is the sibling of the input, grandParent is the parent of the input
-  for (const child of e.currentTarget.parentElement.parentElement.children) {
-    if (child.matches('input')) {
-      // should not be less than min
-      const minVal = Number(child.getAttribute('min'));
+  // select the input element inside the .input-wrapper
+  const input = e.currentTarget.closest('.input-wrapper').querySelector('input');
+  // should not be less than min
+  const minVal = Number(input.getAttribute('min'));
 
-      if ((Number(child.value) - 1) <= minVal) {
-        child.value = minVal;
-      } else {
-        child.value--;
-      }
-
-      // should trigger an change event, handlers called with an object that has an 'currentTarget: input' property, so that value of the input can be obtained using e.currentTarget.value
-      whichHandlerToCall(child)
-
-      return undefined; // short circuit 
-    }
+  if ((Number(input.value) - 1) <= minVal) {
+    input.value = minVal;
+  } else {
+    input.value--;
   }
+
+  // should trigger a change event, handlers called with an object that has an 'currentTarget: input' property, so that value of the input can be obtained using e.currentTarget.value
+  whichHandlerToCall(input);
 }
 
 function holdToIncrementInputButton (e) {
-  // parent is the sibling of the input, grandParent is the parent of the input
-  for (const child of e.currentTarget.parentElement.parentElement.children) {
-    if (child.matches('input')) {
-      // should not be greater than max
-      const maxVal = Number(child.getAttribute('max'));
+  // select the input element inside the .input-wrapper
+  const input = e.currentTarget.closest('.input-wrapper').querySelector('input');
+      
+  // should not be greater than max
+  const maxVal = Number(input.getAttribute('max'));
 
-      const intervalID = setInterval(() => {
-        if ((Number(child.value) + 1) >= maxVal) {
-          child.value = maxVal;
-        } else {
-          child.value++;
-        }
-      }, 100)
-
-      if (e.type === 'mousedown') {
-        document.addEventListener('mouseup', stopTheCrement, { once: true });
-      } else if (e.type === 'touchstart') {
-        document.addEventListener('touchend', stopTheCrement, { once: true });
-      }
-      function stopTheCrement () {
-        clearInterval(intervalID);
-        whichHandlerToCall(child); // call the handler to apply the input value
-      }
-
-      return undefined; // short circuit, 
+  const intervalID = setInterval(() => {
+    if ((Number(input.value) + 1) >= maxVal) {
+      input.value = maxVal;
+    } else {
+      input.value++;
     }
+  }, 200)
+
+  if (e.type === 'mousedown') {
+    document.addEventListener('mouseup', stopTheCrement, { once: true });
+  } else if (e.type === 'touchstart') {
+    document.addEventListener('touchend', stopTheCrement, { once: true });
+  }
+  function stopTheCrement () {
+    clearInterval(intervalID);
+    whichHandlerToCall(input); // call the handler to apply the input value
   }
 }
 function holdToDecrementInputButton (e) {
-  // parent is the sibling of the input, grandParent is the parent of the input
-  for (const child of e.currentTarget.parentElement.parentElement.children) {
-    if (child.matches('input')) {
-      // should not be less than min
-      const minVal = Number(child.getAttribute('min'));
+  // select the input element inside the .input-wrapper
+  const input = e.currentTarget.closest('.input-wrapper').querySelector('input');
+  
+  // should not be less than min
+  const minVal = Number(input.getAttribute('min'));
 
-      const intervalID = setInterval(() => {
-        if ((Number(child.value) - 1) <= minVal) {
-          child.value = minVal;
-        } else {
-          child.value--;
-        }
-      }, 100)
-
-      if (e.type === 'mousedown') {
-        document.addEventListener('mouseup', stopTheCrement, { once: true });
-      } else if (e.type === 'touchstart') {
-        document.addEventListener('touchend', stopTheCrement, { once: true });
-      }
-      function stopTheCrement () {
-        clearInterval(intervalID);
-        whichHandlerToCall(child); // call the handler to apply the input value
-      }
-
-      return undefined; // short circuit, 
+  const intervalID = setInterval(() => {
+    if ((Number(input.value) - 1) <= minVal) {
+      input.value = minVal;
+    } else {
+      input.value--;
     }
+  }, 200)
+
+  if (e.type === 'mousedown') {
+    document.addEventListener('mouseup', stopTheCrement, { once: true });
+  } else if (e.type === 'touchstart') {
+    document.addEventListener('touchend', stopTheCrement, { once: true });
+  }
+  function stopTheCrement () {
+    clearInterval(intervalID);
+    whichHandlerToCall(input); // call the handler to apply the input value
   }
 }
 
